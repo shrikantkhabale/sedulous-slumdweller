@@ -1,0 +1,264 @@
+-----------------------------------Web development using Flask module in Python-----------------------------------------
+
+web basic : server-client-internet
+
+client scripting,server scripting
+Install Flask and import flask,render_template function from module
+create app
+app=Flask(__name__)
+
+create function for every html pages
+
+Jinja template to create same thing in multiple pages
+#download blog template from bootstap side
+
+#only use url for static at href
+# no need to use url for static where https9(url) present and they directly loaded from cloud
+
+# " {{ url_for('static',filename='path/filename.js') }}"
+
+#we have fixed blog index page by putting above url for code
+# but they are 100 of pages then we dont need to add url for in every page. that can be achieved by template inheritance
+# jinja template technique
+
+#change header footer image in every html pages of blog
+#use sublime text 3 to change content in html pages
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+#Program
+from flask import Flask,render_template
+
+app=Flask(__name__)
+
+@app.route("/")
+def home():
+    return render_template('index.html')
+
+@app.route("/about")
+def about():
+    name="Prashant"
+    return render_template('about.html')
+
+@app.route("/contact")
+def contact():
+    return render_template('contact.html')
+
+app.run(debug=True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+Database connectivity in web scraping
+-when application went into production
+-database request from service(godaddy.com hosting)
+-dedicated vps(virtual private server)
+
+- type xamapp install in google from apachefriends
+-download xamapp
+-install in C drive
+-launch xamapp control panel admin
+-start apache and mysql module
+ if apache and mysql module are not start then see the Proccess Id from xamapp control panel and kill the service or app which uses this process id in task manager
+-then type at chrome "localhost/phpmyadmin"
+-before creating database....cleaning html pages (like title, spaces)
+-several blogs should comes from automatically.so use for loop 
+-come to localhost/phpmyadmin (it is mysql or any database handling utility to change table structure and operations(insert), import,export you can export whole database into file and share it other user
+-create new database- give database name
+-create tables as per your blog with required columns and save it
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+How to connect created database with python using Flask SQLAlchemy
+- pip install flask sqlalchemy
+- search for SQLALCHEMY DATABASE URI for mysql
+- app.config['SQLALCHEMY DATABASE URI']= 'mysql://username:password@localhost/db_name'
+
+username=root (if you install xampp without any username)
+password=blank
+db_name=coding thunder (as created on localhost/phpmyadmin)
+-app.config['SQLALCHEMY DATABASE URI']= 'mysql://root:@localhost/coding thunder'
+
+-after that we will create class for database tables
+class User(db.Model):
+    '''
+    srno, name, phone_num, msg, date, email
+    '''
+    srno = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)
+    phone_num = db.Column(db.String(12), nullable=False)
+    msg = db.Column(db.String(120), nullable=False)
+    date = db.Column(db.String(12), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+
+-post request in flask search to once user fill the contact form or on any page that will submit values in database
+-go to perticular page method and methods get,post
+-@app.route("/contact",methods=['GET','POST'])
+def contact():
+    if (request.method=='POST'):
+        ''' Add entry to the database'''
+        name=request.form.get('name')
+        email=request.form.get('email')
+        phone=request.form.get('phone')
+        message=request.form.get('message')
+
+        entry=Contacts(name=name,phone_num=phone,msg=message,date=datetime.now(),email=email)
+        db.session.add(entry)
+        db.session.commit()
+    return render_template('contact.html')
+
+-import request from flask module to identify method and entry to database later commit entry
+-if you put date as nullable false then should enter date otherwise make it as nullable in phpmyadmin and set nullable=True
+-to perform action we need to add action="/contact" method="post" in the contact html file
+-after filling form and click on submit will enter the values into database
+
+**if you still get module error ModuleNotFoundError: No module named 'MySQLdb'. solve this as per below
+-this error comes because of OS issue so pip install MySQL-python also not worked directly in powershell
+-then go to unofficial windows binaries-> search for mysqlclient
+-donwload wheel as per your python version and bit (32 bit 3.8)
+-command pip install whlname
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Making parameters configurable
+-create config.json file
+-mention all params that you want to configure into html pages or at python code
+{
+  "params":
+  {
+    "local server": "True",
+    "local_uri":"mysql://root:@localhost/coding thunder",
+    "prod_uri":"mysql://root:@localhost/coding thunder",
+    "fb_url" : "https://facebook.com/codingthunder",
+    "tw_url" : "https://twitter.com/codingthunder",
+    "gh_url" : "http://github.com/codingthunder",
+    "blog_name" : "CodingThunder",
+    "tag_line" : "A Blog liked by Programmer"
+
+  }
+
+-import json in main.py
+-open (confing.json,"r")
+-params =json.load(c)[params] fetch params from json file and use it in html pages
+-save all and run the app
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+how to send emails by using flask so you don't need to go every at phpmyadmin utility to check for records
+-flask mail documentation
+-using gmail smtp server
+-pip install flask-mail
+-app.config.update(
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = '465',
+    MAIL_USEUSE_SSL=True,
+    MAIL_USERNAME = params['gmail-user'],
+    MAIL_PASSWORD = params['gmail-password']
+)
+-add gmail parameter
+-them mail=Mail(app)
+-after commit, mail.send_message() function to send mail
+-mail.send_message('New message from ' + name,sender = email,
+                          recipients = [params['gmail-user']],
+                          body = message + "\n" + phone)
+-integrityerror -make sure you give primary and auto increment to srno in phpmyadmin
+-authentication error- . Allow less secure apps: ON. (https://myaccount.google.com/lesssecureapps)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+Flask Post page
+
+-go to phpmyadmin and add column slug to it (slug- every html pages after / there are some text containing alphanumeric char (like dash-))
+-there are rules for slug creation . simple slug (dash avoid underscore)
+-add new method for post and @app.route
+-pass string in @app.route("/post/<string:post_slug>",methods=["GET"])
+-post function filter by slug(first only unique slug)
+	post = Posts.query.filter_by(slug=post_slug).first()
+-create class for posts like creted for contacts to fetch the info from databases
+-change image of post_slug like about page or other
+-create column img_file = image_name that is stored in static file
+-put all image name, blog content, blog, title in the database
+-and access those in the html pages by jinja templating {{post.title}} etc.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+Designing blog's Homepage
+
+-display some no of posts and once click on perticular post to read this.
+- fetch data from database on index page using jinja for loop
+- fetch every post title,content from database within loop and pass those params into index.html to use.
+{% for post in posts %}
+<a href="/post/{{post.slug}}"> (ref to no of slug (like if it is first post then direct to first-slug post etc)
+title
+subtitle
+content
+{% endfor %}
+- add servral post in database and limit those on home page by creatin varibale (no_of_posts) in json file
+	code at home function
+ posts = Posts.query.filter_by().all()[0:params["no_of_posts"]]
+
+-add different image name in database for different posts but those image should present in static folder of flask
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Creating Admin Dashboard
+-creating sign in page for blog
+-from bootstap search sign in template and from view page source copy code
+-make necessary changes into sublime text and create login html
+-download image and signin css from sign in template to img and css folder respectively in static folder
+-create required params in json file and used it in login html
+- or get bootstarp CDN to create sign in (copy css and jquery)
+- in jinja templalating, you can use varibale under url_for statement in html page
+-you need to create new variable above it 
+{% set fname = 'img/'+  params['login_image']  %}
+<img class="mb-4" src="{{url_for('static', filename=fname)}}" alt="" width="72" height="72">
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Create Dashboard page once admin user logged in
+
+- set secreat key for flask app,edit delete button to dashboard
+- show all the post with delete,edit button on dashboard
+- if user enters sign in details correctly then he will redirect to admin dashboard where can see table of post and edit & delete option
+so in dashboard method if it is post and user enter username and password then redirect to dashboard
+otherwise keep them sign in
+-create dashboard page
+-add css for table from bootstap.com and all blogs details into that table fetching from database
+-create button for edit and download and design button
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+to make edit delete enable create endpoint for this
+
+-create edit html to edit blog or enter new blog details.
+-if you enter blog details then those saved in database and same will be refected on home page as well as dashboard table
+
+create file uploader
+
+create delete button to delete blogs
+
+add next & previous post button 
+<a class="btn btn-primary float-left" href="{{prev}}">&larr; Previous </a>
+<a class="btn btn-primary float-right" href="{{next}}">Next &rarr;</a>
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Pagination
+-purpose if you have 100 blogs and you want to show 5 blog per page. after clicking on next button next 5 should come
+- logic first page is page1 and fetch only 5 pages per page
+- First middle last
+- if you are on page 1 then next button will open next page next
+	first page
+	 if (page == 1):
+        prev="#"
+        next = "/?page=" + str(page+1)
+
+	middle
+	prev = " /?page=" + str(page-1)
+        next = "/?page=" + str(page+1)
+
+	last
+	prev = " /?page=" + str(page-1)
+        next = "/?page=" + str(page+1)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+export database sql and save it in flask folder
+
+uploading flask blog files on github by using get bash terminal
+create new repository
+and add, commit it
+note : ensure no userid and password files be public
+
+buy only valid domain name from godaddy.com and set up DNS for bought domain.
+
+
