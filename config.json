@@ -6,17 +6,17 @@
     "prod_uri":"mysql://root:@localhost/coding thunder",
     "fb_url" : "https://facebook.com/codingthunder",
     "tw_url" : "https://twitter.com/codingthunder",
-    "gh_url" : "http://github.com/shrikantkhabale",
+    "gh_url" : "http://github.com/user",
     "blog_name" : "CodingThunder",
     "tag_line" : "A Blog liked by Programmer",
-    "gmail-user" : "shrikantkhabale92@gmail.com",
-    "gmail-password" : "Greenland@0",
-    "about_text": "Hi I am Shri and I am learning web development using python by Flask",
+    "gmail-user" : "*****",
+    "gmail-password" : "****",
+    "about_text": "Hi I am user and I am learning web development using python by Flask",
     "no_of_posts" : 2,
     "login_image" : "login.sgv",
-    "admin_user" : "shri",
-    "admin_password" : "shri9307",
-    "upload_location" : "C:\\Users\\shrikantkhabale\\PycharmProjects\\Web_Development_Flask\\static"
+    "admin_user" : "user",
+    "admin_password" : "****",
+    "upload_location" : "C:\\Users\\user\\PycharmProjects\\Web_Development_Flask\\static"
 
   }
 
